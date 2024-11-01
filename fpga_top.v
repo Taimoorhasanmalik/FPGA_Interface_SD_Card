@@ -53,42 +53,71 @@ sd_spi_file_reader #(
     .outbyte        ( outbyte        )
 );
 
-reg [9:0] write_ptr = 10'b0;  // Address pointer for BRAM
-reg wr_en = 0;                // Write enable signal
-wire [7:0] data_out;         // Data output from BRAM
-reg [9:0] addr;
-reg [31:0] size_counter;
-bram_storage bram (
-     .clk(clk),
-     .data_in(outbyte),    // Incoming SPI data
-     .wr_en(wr_en),            // Write enable signal
-     .addr(addr),       // Address pointer (assume 10-bit address for 1K entries)
-     .data_out(data_out)    // Output for reading stored data);
+uart_tx #(
+    .CLK_FREQ                  ( 100000000             ),    // clk is 50MHz
+    .BAUD_RATE                 ( 115200               ),
+    .PARITY                    ( "NONE"               ),
+    .STOP_BITS                 ( 4                    ),
+    .BYTE_WIDTH                ( 1                    ),
+    .FIFO_EA                   ( 14                   ),
+    .EXTRA_BYTE_AFTER_TRANSFER ( ""                   ),
+    .EXTRA_BYTE_AFTER_PACKET   ( ""                   )
+) u_uart_tx (
+    .rstn                      ( resetn                 ),
+    .clk                       ( clk                  ),
+    .i_tready                  (                      ),
+    .i_tvalid                  ( outen                ),
+    .i_tdata                   ( outbyte              ),
+    .i_tkeep                   ( 1'b1                 ),
+    .i_tlast                   ( 1'b0                 ),
+    .o_uart_tx                 ( uart_tx              )
 );
-//----------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+// reg [9:0] write_ptr = 10'b0;  // Address pointer for BRAM
+// reg wr_en = 0;                // Write enable signal
+// wire [7:0] data_out;         // Data output from BRAM
+// reg [9:0] addr;
+// reg [31:0] size_counter;
+// bram_storage bram (
+//      .clk(clk),
+//      .data_in(outbyte),    // Incoming SPI data
+//      .wr_en(wr_en),            // Write enable signal
+//      .addr(addr),       // Address pointer (assume 10-bit address for 1K entries)
+//      .data_out(data_out)    // Output for reading stored data);
+// );
+// //----------------------------------------------------------------------------------------------------
 // send file content to UART
 //----------------------------------------------------------------------------------------------------
 
 // SPI data reception logic...
 // Whenever data is received from SPI
 
-reg [9:0] read_ptr = 10'b0;  // Read pointer
-always @(posedge clk) begin
-    if (outen) begin
-        wr_en <= 1;
-        addr <= write_ptr;  // Increment the pointer after writing
-        write_ptr <= write_ptr +1;
-    end else begin
-        wr_en <= 0;
-        if (filesystem_stat == 3'd6 )begin
-            addr <= read_ptr;  // Increment the read pointer
+// reg [9:0] read_ptr = 10'b0;  // Read pointer
+// always @(posedge clk) begin
+//     if (outen) begin
+//         wr_en <= 1;
+//         addr <= write_ptr;  // Increment the pointer after writing
+//         write_ptr <= write_ptr +1;
+//     end else begin
+//         wr_en <= 0;
+//         if (filesystem_stat == 3'd6 )begin
+//             addr <= read_ptr;  // Increment the read pointer
             
-            if (next)
-            read_ptr <= read_ptr +1;
-        end
-        else read_ptr =0 ;
-        end
-    end
+//             if (next)
+//             read_ptr <= read_ptr +1;
+//         end
+//         else read_ptr =0 ;
+//         end
+//     end
 
 // display_bram_data display_inst (
 //         .clk(clk),
