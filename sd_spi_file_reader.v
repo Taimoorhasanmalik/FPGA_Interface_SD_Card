@@ -11,7 +11,7 @@
 
 module sd_spi_file_reader #(
     parameter            FILE_NAME_LEN = 11           , // length of FILE_NAME (in bytes). Since the length of "example.txt" is 11, so here is 11.
-    parameter [52*8-1:0] FILE_NAME     = "example.txt", // file name to read, ignore upper and lower case
+    parameter [52*8-1:0] FILE_NAME     = "data", // file name to read, ignore upper and lower case
                                                         // For example, if you want to read a file named "HeLLo123.txt", this parameter can be "hello123.TXT", "HELLO123.txt" or "HEllo123.Txt"
     parameter            SPI_CLK_DIV   = 100             // SD spi_sck freq = clk freq/(2*SPI_CLK_DIV), modify SPI_CLK_DIV to change the SPI speed
                                                         // For example, when clk=50MHz, SPI_CLK_DIV=50,then spi_sck=50MHz/(2*50)=500kHz, 500kHz is a typical SPI speed for SDcard
@@ -509,20 +509,17 @@ always @ (posedge clk or negedge rstn)
 // output file content
 //----------------------------------------------------------------------------------------------------------------------
 reg [31:0] fptr = 0;
-
-always @ (posedge clk or negedge rstn)
-    if(~rstn) begin
+always @(posedge clk or negedge rstn) begin
+    if (~rstn) begin
         fptr <= 0;
-        {outen,outbyte} <= 0;
-
+        {outen, outbyte} <= 0;
     end else begin
-        if(rvalid && filesystem_state==READ_A_FILE && ~search_fat && fptr<file_size) begin
+        if (rvalid && filesystem_state == READ_A_FILE && ~search_fat && fptr < file_size) begin                    
             fptr <= fptr + 1;
-            {outen,outbyte} <= {1'b1,rdata};
-        end else
-            {outen,outbyte} <= 0;
-
+            {outen, outbyte} <= {1'b1, rdata};
+        end else begin
+            {outen, outbyte} <= 0;
+        end
     end
-
-
+end
 endmodule

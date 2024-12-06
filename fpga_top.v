@@ -13,7 +13,6 @@ module fpga_top (
     input  wire         clk,
     // resetn active-low, You can re-scan and re-read SDcard by pushing the reset button.
     input  wire         resetn,
-    input wire          next   ,
     // signals connect to SD SPI bus
     output wire         sd_spi_ssn,
     output wire         sd_spi_sck,
@@ -27,6 +26,7 @@ module fpga_top (
     output wire [6:0] seg
 );
 
+
 //---------------------------------------------------------------------------------------------------
 // sd_spi_file_reader
 //----------------------------------------------------------------------------------------------------
@@ -34,9 +34,9 @@ wire       outen;     // when outen=1, a byte of file content is read out from o
 wire [7:0] outbyte;   // a byte of file content
 wire [2:0] filesystem_stat;
 sd_spi_file_reader #(
-    .FILE_NAME_LEN  ( 11             ),  // the length of "example.txt" (in bytes)
-    .FILE_NAME      ( "example.txt"  ),  // file name to read
-    .SPI_CLK_DIV    ( 100             )   // because clk=50MHz, SPI_CLK_DIV is set to 50
+    .FILE_NAME_LEN  ( 8             ),  // the length of "example.txt" (in bytes)
+    .FILE_NAME      ( "data.bin"  ),  // file name to read
+    .SPI_CLK_DIV    ( 100             )   // because clk=100MHz, SPI_CLK_DIV is set to 100
 ) u_sd_spi_file_reader (
     .rstn           ( resetn         ),
     .clk            ( clk            ),
@@ -54,10 +54,10 @@ sd_spi_file_reader #(
 );
 
 uart_tx #(
-    .CLK_FREQ                  ( 100000000             ),    // clk is 50MHz
-    .BAUD_RATE                 ( 115200               ),
+    .CLK_FREQ                  ( 100000000            ),    // clk is 50MHz
+    .BAUD_RATE                 ( 921600               ),
     .PARITY                    ( "NONE"               ),
-    .STOP_BITS                 ( 4                    ),
+    .STOP_BITS                 ( 1                    ),
     .BYTE_WIDTH                ( 1                    ),
     .FIFO_EA                   ( 14                   ),
     .EXTRA_BYTE_AFTER_TRANSFER ( ""                   ),
@@ -72,8 +72,6 @@ uart_tx #(
     .i_tlast                   ( 1'b0                 ),
     .o_uart_tx                 ( uart_tx              )
 );
-
-
 
 
 endmodule

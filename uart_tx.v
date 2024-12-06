@@ -19,7 +19,7 @@ module uart_tx #(
     // TX fifo depth
     parameter  FIFO_EA                   = 14,            // 0:no fifo   1,2:depth=4   3:depth=8   4:depth=16  ...  10:depth=1024   11:depth=2048  ...
     // do you want to send extra byte after each AXI-stream transfer or packet?
-    parameter  EXTRA_BYTE_AFTER_TRANSFER = "A",           // specify a extra byte to send after each AXI-stream transfer. when ="", do not send this extra byte
+    parameter  EXTRA_BYTE_AFTER_TRANSFER = "",           // specify a extra byte to send after each AXI-stream transfer. when ="", do not send this extra byte
     parameter  EXTRA_BYTE_AFTER_PACKET   = ""            // specify a extra byte to send after each AXI-stream packet  . when ="", do not send this extra byte
 ) (
     input  wire                    rstn,
