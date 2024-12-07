@@ -53,25 +53,37 @@ sd_spi_file_reader #(
     .outbyte        ( outbyte        )
 );
 
-uart_tx #(
-    .CLK_FREQ                  ( 100000000            ),    // clk is 50MHz
-    .BAUD_RATE                 ( 921600               ),
-    .PARITY                    ( "NONE"               ),
-    .STOP_BITS                 ( 1                    ),
-    .BYTE_WIDTH                ( 1                    ),
-    .FIFO_EA                   ( 14                   ),
-    .EXTRA_BYTE_AFTER_TRANSFER ( ""                   ),
-    .EXTRA_BYTE_AFTER_PACKET   ( ""                   )
-) u_uart_tx (
-    .rstn                      ( resetn                 ),
-    .clk                       ( clk                  ),
-    .i_tready                  (                      ),
-    .i_tvalid                  ( outen                ),
-    .i_tdata                   ( outbyte              ),
-    .i_tkeep                   ( 1'b1                 ),
-    .i_tlast                   ( 1'b0                 ),
-    .o_uart_tx                 ( uart_tx              )
-);
+wire [7:0] data_out;
+
+accumulator acc (
+    .clk(clk),
+    .resetn(resetn),
+    .data_in(outbyte),
+    .en(outen),
+    .data_out(data_out)
+)
+
+
+
+// uart_tx #(
+//     .CLK_FREQ                  ( 100000000            ),    // clk is 50MHz
+//     .BAUD_RATE                 ( 921600               ),
+//     .PARITY                    ( "NONE"               ),
+//     .STOP_BITS                 ( 1                    ),
+//     .BYTE_WIDTH                ( 1                    ),
+//     .FIFO_EA                   ( 14                   ),
+//     .EXTRA_BYTE_AFTER_TRANSFER ( ""                   ),
+//     .EXTRA_BYTE_AFTER_PACKET   ( ""                   )
+// ) u_uart_tx (
+//     .rstn                      ( resetn                 ),
+//     .clk                       ( clk                  ),
+//     .i_tready                  (                      ),
+//     .i_tvalid                  ( outen                ),
+//     .i_tdata                   ( outbyte              ),
+//     .i_tkeep                   ( 1'b1                 ),
+//     .i_tlast                   ( 1'b0                 ),
+//     .o_uart_tx                 ( uart_tx              )
+// );
 
 
 endmodule
