@@ -53,15 +53,12 @@ sd_spi_file_reader #(
     .outbyte        ( outbyte        )
 );
 
-wire [7:0] data_out;
+wire [23:0] data_out;
+reg rd;
+wire read_out;
 
-accumulator acc (
-    .clk(clk),
-    .resetn(resetn),
-    .data_in(outbyte),
-    .en(outen),
-    .data_out(data_out)
-)
+accumulator acc ( .clk(clk), .resetn(resetn), .outen(wr_en), .rd(rd), .data_in(outbyte), .data_out(data_out), .outbyte(read_out));
+
 
 
 
