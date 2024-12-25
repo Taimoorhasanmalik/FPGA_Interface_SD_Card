@@ -56,31 +56,56 @@ sd_spi_file_reader #(
 wire [23:0] data_out;
 reg rd;
 wire read_out;
+reg [8:0]  wptr,rptr;
+reg [31:0] count;
+wire write_done;
+accumulator acc ( .clk(clk), .resetn(resetn), .write_done(write_done), .wr_en(outen), .rd(rd), .data_in(outbyte), .data_out(data_out), .outbyte(read_out) ,.rptr(rptr),.wptr(wptr));
 
-accumulator acc ( .clk(clk), .resetn(resetn), .outen(wr_en), .rd(rd), .data_in(outbyte), .data_out(data_out), .outbyte(read_out));
+always @(posedge clk) begin
+    if (~resetn)
+    begin
+        count < = 0;
+    end
+    else begin
+    if (outen)
+    begin
+        rd <= 0;
+        if (write_done) wptr <= wptr +1;
+        else wptr <= wptr;
+    end    
+    else
+    begin
+        rd <= 1;    
+        if (read_out)
+        begin
+            rptr <= rptr+1;
+            count <= count +1;
+        end   
+    end
+    end
+end
 
 
 
-
-// uart_tx #(
-//     .CLK_FREQ                  ( 100000000            ),    // clk is 50MHz
-//     .BAUD_RATE                 ( 921600               ),
-//     .PARITY                    ( "NONE"               ),
-//     .STOP_BITS                 ( 1                    ),
-//     .BYTE_WIDTH                ( 1                    ),
-//     .FIFO_EA                   ( 14                   ),
-//     .EXTRA_BYTE_AFTER_TRANSFER ( ""                   ),
-//     .EXTRA_BYTE_AFTER_PACKET   ( ""                   )
-// ) u_uart_tx (
-//     .rstn                      ( resetn                 ),
-//     .clk                       ( clk                  ),
-//     .i_tready                  (                      ),
-//     .i_tvalid                  ( outen                ),
-//     .i_tdata                   ( outbyte              ),
-//     .i_tkeep                   ( 1'b1                 ),
-//     .i_tlast                   ( 1'b0                 ),
-//     .o_uart_tx                 ( uart_tx              )
-// );
+ uart_tx #(
+     .CLK_FREQ                  ( 100000000            ),    // clk is 50MHz
+     .BAUD_RATE                 ( 921600               ),
+     .PARITY                    ( "NONE"               ),
+     .STOP_BITS                 ( 1                    ),
+     .BYTE_WIDTH                ( 1                    ),
+     .FIFO_EA                   ( 14                   ),
+     .EXTRA_BYTE_AFTER_TRANSFER ( ""                   ),
+     .EXTRA_BYTE_AFTER_PACKET   ( ""                   )
+ ) u_uart_tx (
+     .rstn                      ( resetn                 ),
+     .clk                       ( clk                  ),
+     .i_tready                  (                      ),
+     .i_tvalid                  ( read_out                ),
+     .i_tdata                   ( data_out            ),
+     .i_tkeep                   ( 1'b1                 ),
+     .i_tlast                   ( 1'b0                 ),
+     .o_uart_tx                 ( uart_tx              )
+ );
 
 
 endmodule
